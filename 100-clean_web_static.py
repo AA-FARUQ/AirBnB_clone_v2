@@ -9,30 +9,30 @@ env.hosts = ['34.138.32.248', '3.226.74.205']
 
 
 @runs_once
-def create_archive():
+def do_pack():
     """Archives the static files."""
     if not os.path.isdir("versions"):
         os.mkdir("versions")
-    current_time = datetime.now()
-    archive_path = "versions/web_static_{}{}{}{}{}{}.tgz".format(
-        current_time.year,
-        current_time.month,
-        current_time.day,
-        current_time.hour,
-        current_time.minute,
-        current_time.second
+    cur_time = datetime.now()
+    output = "versions/web_static_{}{}{}{}{}{}.tgz".format(
+        cur_time.year,
+        cur_time.month,
+        cur_time.day,
+        cur_time.hour,
+        cur_time.minute,
+        cur_time.second
     )
     try:
-        print("Packing web_static to {}".format(archive_path))
-        local("tar -cvzf {} web_static".format(archive_path))
-        archive_size = os.stat(output).st_size
-        print("web_static packed: {} -> {} Bytes".format(archive_path, archive_size))
+        print("Packing web_static to {}".format(output))
+        local("tar -cvzf {} web_static".format(output))
+        archize_size = os.stat(output).st_size
+        print("web_static packed: {} -> {} Bytes".format(output, archize_size))
     except Exception:
-        archive_path = None
-    return archive_path
+        output = None
+    return output
 
 
-def deploy_static(archive_path):
+def do_deploy(archive_path):
     """Deploys the static files to the host servers.
     Args:
         archive_path (str): The path to the archived static files.
@@ -62,11 +62,11 @@ def deploy_static(archive_path):
 def deploy():
     """Archives and deploys the static files to the host servers.
     """
-    archive_path = create_archive()
-    return deploy_static(archive_path) if archive_path else False
+    archive_path = do_pack()
+    return do_deploy(archive_path) if archive_path else False
 
 
-def clean_archives(number=0):
+def do_clean(number=0):
     """Deletes out-of-date archives of the static files.
     Args:
         number (Any): The number of archives to keep.
